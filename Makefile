@@ -1,18 +1,25 @@
 MAKEFLAGS += --no-print-directory
-NAME = fdf
+NAME = so_long
 
 SRC_DIR = srcs
 OBJ_DIR = objs
+NAME_BONUS = so_long_bonus
+BONUS_SRC_DIR = srcs_bonus
+BONUS_OBJ_DIR = objs_bonus
 INC_DIR = include
 
 SRC = $(shell find $(SRC_DIR) -name '*.c')
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 DEP = $(OBJ:.o=.d)
 
+BONUS_SRC = $(shell find $(BONUS_SRC_DIR) -name '*.c')
+BONUS_OBJ = $(BONUS_SRC:$(BONUS_SRC_DIR)/%.c=$(BONUS_OBJ_DIR)/%.o)
+BONUS_DEP = $(BONUS_OBJ:.o=.d)
+
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -O3 -flto -funroll-loops \
 	-ftree-vectorize -fomit-frame-pointer \
-	-I$(INC_DIR) -I$(MLX42_DIR)/include
+	-I$(INC_DIR) -I$(LIBFT_DIR) -I$(MLX42_DIR)/include
 DEPFLAGS = -MMD -MP
 
 UNAME_S := $(shell uname -s)
@@ -38,11 +45,20 @@ all: $(LIBMLX42) $(NAME)
 $(NAME): $(LIBFT) $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) $(LIBS) -o $(NAME)
 
+bonus: $(LIBMLX42) $(NAME_BONUS)
+
+$(NAME_BONUS): $(LIBFT) $(BONUS_OBJ)
+	$(CC) $(CFLAGS) $(BONUS_OBJ) $(LIBS) -o $(NAME_BONUS)
+
+$(BONUS_OBJ_DIR)/%.o: $(BONUS_SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(DEPFLAGS) -c $< -o $@
+
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(DEPFLAGS) -c $< -o $@
 
--include $(DEP)
+-include $(DEP) $(BONUS_DEP)
 
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
@@ -55,14 +71,14 @@ $(LIBMLX42): | $(MLX42_DIR)
 	cmake --build $(MLX42_BUILD) -j$(shell nproc 2>/dev/null || echo 4)
 
 clean:
-	rm -rf $(OBJ_DIR)
+	rm -rf $(OBJ_DIR) $(BONUS_OBJ_DIR)
 	$(MAKE) -C $(LIBFT_DIR) clean
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(NAME) $(NAME_BONUS)
 	$(MAKE) -C $(LIBFT_DIR) fclean
 	rm -rf $(MLX42_DIR)
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all bonus clean fclean re
