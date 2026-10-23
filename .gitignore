@@ -2,3 +2,6 @@ MLX42/
 objs/
 so_long
 so_long_bonus
+objs_bonus/
+libft/libft.a
+libft/objs/
