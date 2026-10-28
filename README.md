@@ -37,4 +37,4 @@ Map characters: `0` empty, `1` wall, `C` collectible, `E` exit, `P` start, and `
 - [GLFW documentation](https://www.glfw.org/documentation.html)
 - [Flood fill](https://en.wikipedia.org/wiki/Flood_fill)
 
-AI use: Claude Code generated the first version of the sources, the textures (drawn procedurally with a Python script), the maps and this README. All of it was reviewed and tested by the author.
+AI use: Claude Code generated the first version of the textures (drawn procedurally with a Python script), the maps and this README. All of it was reviewed and tested by the author.
